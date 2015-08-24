@@ -7,14 +7,9 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import android.util.Log;
-import com.zebra.sdk.comm.BluetoothDiscoverer;
-import com.zebra.sdk.comm.BluetoothConnectionInsecure;
-import com.zebra.sdk.comm.Connection;
-import com.zebra.sdk.comm.ConnectionException;
-import com.zebra.sdk.printer.PrinterStatus;
-import com.zebra.sdk.printer.ZebraPrinter;
-import com.zebra.sdk.printer.ZebraPrinterFactory;
-import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
+import com.zebra.android.discovery.*;
+import com.zebra.sdk.comm.*;
+import com.zebra.sdk.printer.*;
 
 public class ZebraBluetoothPrinter extends CordovaPlugin {
 
@@ -32,7 +27,7 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
                 String mac = args.getString(0);
                 String msg = args.getString(1);
                 sendData(callbackContext, mac, msg);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
                 e.printStackTrace();
             }
@@ -41,7 +36,7 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         if (action.equals("find")) {
             try {
                 findPrinter(callbackContext);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(LOG_TAG, e.getMessage());
                 e.printStackTrace();
             }
@@ -50,9 +45,9 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         return false;
     }
     
-    public String findPrinter(final CallbackContext callbackContext) {
+    public void findPrinter(final CallbackContext callbackContext) {
       try {
-          BluetoothDiscoverer.findPrinters(this, new DiscoveryHandler() {
+          BluetoothDiscoverer.findPrinters(this.cordova.getActivity().getApplicationContext(), new DiscoveryHandler() {
 
               public void foundPrinter(DiscoveredPrinter printer) {
                   String macAddress = printer.address;
@@ -69,9 +64,7 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
                   callbackContext.error(message);
               }
           });
-      } catch (ConnectionException e) {
-          e.printStackTrace();
-      } catch (InterruptedException e) {
+      } catch (Exception e) {
           e.printStackTrace();
       }      
     }

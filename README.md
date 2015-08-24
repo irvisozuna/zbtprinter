@@ -18,7 +18,7 @@ cordova.plugins.zbtprinter.find(function(mac) {
 You can send data in ZPL Zebra Programing Language:
 
 ```
-cordova.plugins.zbtprinter.print("AC:3F:A4:1D:7A:5C", "^XA^FO10,10^AFN,26,13^FDHello, World!^FS^XZ",
+cordova.plugins.zbtprinter.print("AC:3F:A4:1D:7A:5C", "! U1 setvar "device.languages" "line_print"\r\nTEXT 11 0 0 0   ***Print test***\r\nPRINT\r\n",
     function(success) { 
         alert("Print ok"); 
     }, function(fail) { 
