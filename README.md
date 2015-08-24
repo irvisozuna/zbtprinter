@@ -37,7 +37,7 @@ cordova plugin add https://github.com/michael79bxl/zbtprinter.git
 ###Phonegap build
 
 ```
-<gap:plugin name="com.github.michael79bxl.zbtprinter" source="npm" />
+<gap:plugin name="cordova-plugin-zbtprinter" source="npm" />
 ```
 
 
