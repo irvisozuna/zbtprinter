@@ -31,16 +31,15 @@ cordova.plugins.zbtprinter.print("AC:3F:A4:1D:7A:5C", "^XA^FO10,10^AFN,26,13^FDH
 ###Cordova
 
 ```
-cordova plugin add https://github.com/mmilidoni/zbtprinter.git
+cordova plugin add https://github.com/michael79bxl/zbtprinter.git
 ```
 
-###Very important!
-
-This plugin is in developer version, you need to set MAC Address of your printer at following file:
+###Phonegap build
 
 ```
-src/android/it/zenitlab/cordova/plugins/zbtprinter/ZebraBluetoothPrinter.java
+<gap:plugin name="com.github.michael79bxl.zbtprinter" source="npm" />
 ```
+
 
 ##ZPL - Zebra Programming Language
 For more information about ZPL please see the  [PDF Official Manual](https://support.zebra.com/cpws/docs/zpl/zpl_manual.pdf)
