@@ -14,6 +14,8 @@ import com.zebra.sdk.printer.*;
 public class ZebraBluetoothPrinter extends CordovaPlugin {
 
     private static final String LOG_TAG = "ZebraBluetoothPrinter";
+    private Connection printerConnection;
+    private ZebraPrinter printer;
     //String mac = "AC:3F:A4:1D:7A:5C";
 
     public ZebraBluetoothPrinter() {
@@ -76,38 +78,82 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    // Instantiate insecure connection for given Bluetooth MAC Address.
-                    Connection thePrinterConn = new BluetoothConnectionInsecure(mac);
-
-                    // Verify the printer is ready to print
-                    if (isPrinterReady(thePrinterConn)) {
-
-                        // Open the connection - physical connection is established here.
-                        thePrinterConn.open();
-
-                        // Send the data to printer as a byte array.
-//                        thePrinterConn.write("^XA^FO0,20^FD^FS^XZ".getBytes());
-                        thePrinterConn.write(msg.getBytes());
-
-
-                        // Make sure the data got to the printer before closing the connection
-                        Thread.sleep(500);
-
-                        // Close the insecure connection to release resources.
-                        thePrinterConn.close();
-                        callbackContext.success("Done");
-                    } else {
-						callbackContext.error("Printer is not ready");
-					}
-                } catch (Exception e) {
-                    // Handle communications error here.
-                    callbackContext.error(e.getMessage());
-                }
-            }
+              doConnection(mac);
+          }
         }).start();
     }
+    private void doConnection(String mac) {
+        printer = connect(mac);
+        if (printer != null) {
+            sendTestLabel();
+        } else {
+            disconnect();
+        }
+    }
 
+    public ZebraPrinter connect(String mac) {
+        printerConnection = null;
+        if (isBluetoothSelected()) {
+            printerConnection = new BluetoothConnection(mac);
+        } else {
+            try {
+                int port = Integer.parseInt(getTcpPortNumber());
+                printerConnection = new TcpConnection(getTcpAddress(), port);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        try {
+            printerConnection.open();
+        } catch (ConnectionException e) {
+            Thread.sleep(1000);
+            disconnect();
+        }
+
+        ZebraPrinter printer = null;
+
+        if (printerConnection.isConnected()) {
+            try {
+                printer = ZebraPrinterFactory.getInstance(printerConnection);
+                PrinterLanguage pl = printer.getPrinterControlLanguage();
+            } catch (ConnectionException e) {
+                printer = null;
+                Thread.sleep(1000);
+                disconnect();
+            } catch (ZebraPrinterLanguageUnknownException e) {
+                printer = null;
+                Thread.sleep(1000);
+                disconnect();
+            }
+        }
+
+        return printer;
+    }
+    public void disconnect() {
+        try {
+            if (printerConnection != null) {
+                printerConnection.close();
+            }
+        } catch (ConnectionException e) {
+        } finally {
+        }
+    }
+    private void sendTestLabel() {
+        try {
+            byte[] configLabel = getConfigLabel();
+            printerConnection.write(configLabel);
+            Thread.sleep(1500);
+            if (printerConnection instanceof BluetoothConnection) {
+                String friendlyName = ((BluetoothConnection) printerConnection).getFriendlyName();
+                Thread.sleep(500);
+            }
+        } catch (ConnectionException e) {
+
+        } finally {
+            disconnect();
+        }
+    }
     private Boolean isPrinterReady(Connection connection) throws ConnectionException, ZebraPrinterLanguageUnknownException {
         Boolean isOK = false;
         connection.open();
@@ -127,5 +173,16 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         }
         return isOK;
     }
-}
+    private byte[] getConfigLabel() {
+        PrinterLanguage printerLanguage = printer.getPrinterControlLanguage();
 
+        byte[] configLabel = null;
+        if (printerLanguage == PrinterLanguage.ZPL) {
+            configLabel = "Hola Mundo".getBytes();
+        } else if (printerLanguage == PrinterLanguage.CPCL) {
+            String cpclConfigLabel = "! 0 200 200 406 1\r\n" + "ON-FEED IGNORE\r\n" + "BOX 20 20 380 380 8\r\n" + "T 0 6 137 177 TEST\r\n" + "PRINT\r\n";
+            configLabel = cpclConfigLabel.getBytes();
+        }
+        return configLabel;
+    }
+}
