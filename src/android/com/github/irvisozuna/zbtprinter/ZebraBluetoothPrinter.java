@@ -85,17 +85,14 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         new Thread(new Runnable() {
             @Override
             public void run() {
-              doConnection(mac);
+              printer = connect(mac);
+              if (printer != null) {
+                  sendLabel(msg);
+              } else {
+                  disconnect();
+              }
           }
         }).start();
-    }
-    private void doConnection(String mac) {
-        printer = connect(mac);
-        if (printer != null) {
-            sendTestLabel();
-        } else {
-            disconnect();
-        }
     }
 
     public ZebraPrinter connect(String mac) {
@@ -142,9 +139,9 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         } finally {
         }
     }
-    private void sendTestLabel() {
+    private void sendLabel(String msg) {
         try {
-            byte[] configLabel = getConfigLabel();
+            byte[] configLabel = getConfigLabel(msg);
             printerConnection.write(configLabel);
             sleep(1500);
             if (printerConnection instanceof BluetoothConnection) {
@@ -158,12 +155,12 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         }
     }
 
-    private byte[] getConfigLabel() {
+    private byte[] getConfigLabel(String msg) {
         PrinterLanguage printerLanguage = printer.getPrinterControlLanguage();
 
         byte[] configLabel = null;
         if (printerLanguage == PrinterLanguage.ZPL) {
-            configLabel = "Hola Mundo".getBytes();
+            configLabel = msg.getBytes();
         } else if (printerLanguage == PrinterLanguage.CPCL) {
             String cpclConfigLabel = "! 0 200 200 406 1\r\n" + "ON-FEED IGNORE\r\n" + "BOX 20 20 380 380 8\r\n" + "T 0 6 137 177 TEST\r\n" + "PRINT\r\n";
             configLabel = cpclConfigLabel.getBytes();
