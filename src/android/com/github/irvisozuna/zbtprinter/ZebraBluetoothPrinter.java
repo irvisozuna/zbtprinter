@@ -157,25 +157,7 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
             disconnect();
         }
     }
-    private Boolean isPrinterReady(Connection connection) throws ConnectionException, ZebraPrinterLanguageUnknownException {
-        Boolean isOK = false;
-        connection.open();
-        // Creates a ZebraPrinter object to use Zebra specific functionality like getCurrentStatus()
-        ZebraPrinter printer = ZebraPrinterFactory.getInstance(connection);
-        PrinterStatus printerStatus = printer.getCurrentStatus();
-        if (printerStatus.isReadyToPrint) {
-            isOK = true;
-        } else if (printerStatus.isPaused) {
-            throw new ConnectionException("Cannot print because the printer is paused");
-        } else if (printerStatus.isHeadOpen) {
-            throw new ConnectionException("Cannot print because the printer media door is open");
-        } else if (printerStatus.isPaperOut) {
-            throw new ConnectionException("Cannot print because the paper is out");
-        } else {
-            throw new ConnectionException("Cannot print");
-        }
-        return isOK;
-    }
+
     private byte[] getConfigLabel() {
         PrinterLanguage printerLanguage = printer.getPrinterControlLanguage();
 
