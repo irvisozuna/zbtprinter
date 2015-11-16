@@ -123,7 +123,7 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
 
         return printer;
     }
-    public void isBluetoothSelected(){
+    public Boolean isBluetoothSelected(){
       return true;
     }
     public void disconnect() {
