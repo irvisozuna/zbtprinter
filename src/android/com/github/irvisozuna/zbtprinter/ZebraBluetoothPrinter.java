@@ -95,14 +95,7 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         printerConnection = null;
         if (isBluetoothSelected()) {
             printerConnection = new BluetoothConnection(mac);
-        } else {
-            try {
-                int port = Integer.parseInt(getTcpPortNumber());
-                printerConnection = new TcpConnection(getTcpAddress(), port);
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
+        } 
 
         try {
             printerConnection.open();
@@ -129,6 +122,9 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
         }
 
         return printer;
+    }
+    public void isBluetoothSelected(){
+      return true;
     }
     public void disconnect() {
         try {
