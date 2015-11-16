@@ -1,15 +1,22 @@
 package com.github.irvisozuna.zbtprinter;
 
 import java.io.IOException;
-
+import android.os.Bundle;
+import android.os.Looper;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 import android.util.Log;
 import com.zebra.android.discovery.*;
-import com.zebra.sdk.comm.*;
-import com.zebra.sdk.printer.*;
+import com.zebra.sdk.comm.BluetoothConnection;
+import com.zebra.sdk.comm.Connection;
+import com.zebra.sdk.comm.ConnectionException;
+import com.zebra.sdk.comm.TcpConnection;
+import com.zebra.sdk.printer.PrinterLanguage;
+import com.zebra.sdk.printer.ZebraPrinter;
+import com.zebra.sdk.printer.ZebraPrinterFactory;
+import com.zebra.sdk.printer.ZebraPrinterLanguageUnknownException;
 
 public class ZebraBluetoothPrinter extends CordovaPlugin {
 
