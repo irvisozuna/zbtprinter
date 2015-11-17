@@ -59,27 +59,32 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
     }
     
     public void findPrinter(final CallbackContext callbackContext) {
-      try {
-          BluetoothDiscoverer.findPrinters(this.cordova.getActivity().getApplicationContext(), new DiscoveryHandler() {
+      new Thread(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                  BluetoothDiscoverer.findPrinters(cordova.getActivity().getApplicationContext(), new DiscoveryHandler() {
 
-              public void foundPrinter(DiscoveredPrinter printer) {
-                  String macAddress = printer.address;
-                  //I found a printer! I can use the properties of a Discovered printer (address) to make a Bluetooth Connection
-                  callbackContext.success(printer.address);
-              }
+                      public void foundPrinter(DiscoveredPrinter printer) {
+                          String macAddress = printer.address;
+                          //I found a printer! I can use the properties of a Discovered printer (address) to make a Bluetooth Connection
+                          callbackContext.success(printer.address);
+                      }
 
-              public void discoveryFinished() {
-                  //Discovery is done
-              }
+                      public void discoveryFinished() {
+                          //Discovery is done
+                      }
 
-              public void discoveryError(String message) {
-                  //Error during discovery
-                  callbackContext.error(message);
+                      public void discoveryError(String message) {
+                          //Error during discovery
+                          callbackContext.error(message);
+                      }
+                  });
+              } catch (Exception e) {
+                  callbackContext.error(e.getMessage());
               }
-          });
-      } catch (Exception e) {
-          e.printStackTrace();
-      }      
+            }
+        }).start();    
     }
 
     /*
