@@ -92,8 +92,10 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
               printer = connect(mac);
               if (printer != null) {
                   sendLabel(msg);
+                  callbackContext.success(msg);
               } else {
                   disconnect();
+                  callbackContext.error('Error');
               }
           }
         }).start();
