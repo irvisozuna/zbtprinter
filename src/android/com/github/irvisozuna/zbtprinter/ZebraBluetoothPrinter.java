@@ -65,7 +65,7 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
               public void foundPrinter(DiscoveredPrinter printer) {
                   String macAddress = printer.address;
                   //I found a printer! I can use the properties of a Discovered printer (address) to make a Bluetooth Connection
-                  callbackContext.success(printer);
+                  callbackContext.success(printer.address);
               }
 
               public void discoveryFinished() {
