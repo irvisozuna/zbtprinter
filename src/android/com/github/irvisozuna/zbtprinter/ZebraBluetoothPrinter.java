@@ -155,10 +155,6 @@ public class ZebraBluetoothPrinter extends CordovaPlugin {
             byte[] configLabel = getConfigLabel(msg);
             printerConnection.write(configLabel);
             sleep(1500);
-            if (printerConnection instanceof BluetoothConnection) {
-                String friendlyName = ((BluetoothConnection) printerConnection).getFriendlyName();
-                sleep(500);
-            }
         } catch (ConnectionException e) {
 
         } finally {
